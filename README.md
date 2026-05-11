@@ -1,30 +1,30 @@
 # Scale Suicide 🎸
 
-A web-based scale and arpeggio practice tool for guitarists. Inspired by the basketball conditioning drill of the same name — sprint through all 12 keys, survive. Randomizes root notes, runs a precision Web Audio metronome, tracks session time, and logs progress to a cumulative Excel file. No install, no server — open and play.
+A web-based scale and arpeggio practice tool for guitarists. Inspired by the basketball conditioning drill of the same name — sprint through all 12 keys, survive. Randomizes root notes, runs a precision Web Audio metronome, tracks session time, and logs cumulative progress to Excel. No install, no server — open and play.
 
 ## What it does
 
-Each session presents all 12 root notes (in random order, or following the circle of fifths/fourths). For each root, you play the assigned scale or arpeggio type at the metronome tempo in the selected execution style, then press **Next Note** to advance. When all 12 are done, a modal asks how it went — rate the session and save to the Excel log.
+Each session presents all 12 root notes in random order (or following the circle of fifths/fourths). For each root, you play the assigned scale or arpeggio type at the metronome tempo in the selected execution style, then press **Next Note** to advance. When all 12 are done, a modal asks how it went — rate the session and save to the Excel log.
 
 ## Features
 
 ### Exercise configuration
 - **"Executed by"** — select Scales or Arpeggios before each session
+- **💀 Random** — randomizes exercise type and execution mode in one click
 - **Scale types** — Major, Dominant 7th, Natural Minor, Harmonic Minor, Melodic Minor, Whole-Half, Half-Whole
 - **Arpeggio types (4-voice)** — Maj7, 7, min7, min7b5, dim7, minMaj7, Maj7♯5, 7sus4, Maj6, min6
 - **Execution modes for scales** — Box, 3 notes/string, 2 notes/string, 4 notes/string
 - **Execution modes for arpeggios** — Box, Diatonic approach ↓/↑, Diatonic enclosure, Chromatic approach ↓/↑, Chromatic enclosure, Pivot, Triplet
-- **Box/fret position** — shown automatically when Box is selected (scales) or always (arpeggios); 13 positions from 0-4 (open) to 12-16; randomized with the **Change** button
-- **⚤ Random** — randomizes exercise type and execution mode in one click
+- **Box/fret position** — shown automatically when Box is selected (scales) or always (arpeggios); 13 positions from 0-4 (open) to 12-16; **Change** button randomizes it on demand
 
 ### Note ordering
 - Random (default), Circle of 5ths, Circle of 4ths
-- Automatic enharmonic notation — the app picks sharps or flats based on the correct key signature for each scale type and root, no manual selection needed
+- Automatic enharmonic notation — sharps or flats chosen from the correct key signature for each scale type and root
 
 ### Accidentals display
 - Shows the scale's altered notes in two orderings: circle-of-fifths order and scale-degree order
 - Eye toggle to hide/reveal (useful for ear training)
-- Automatically hidden for arpeggios
+- Hidden automatically for arpeggios
 
 ### Metronome
 - Precision Web Audio engine with lookahead scheduling and pre-synthesized AudioBuffer clicks — accurate at any tempo and over long sessions
@@ -38,16 +38,16 @@ Each session presents all 12 root notes (in random order, or following the circl
 - Screen Wake Lock — prevents the screen from turning off during practice (Safari iOS 16.4+, all modern desktop browsers)
 - Session rating modal on Save — "Did you survive?": Whooohooo / OK / Nah
 - Persistent history via browser localStorage (separate per browser/device)
-- **Excel export** — cumulative log with color-coded rating column (green/orange/red) and all session parameters; CSV fallback if offline
+- **Excel export** — cumulative log with color-coded rating column (green/orange/red); CSV fallback if offline
 
 ### Excel columns logged per session
-Rating · Exercise (Scales/Arpeggios) · Type · Execution · Box/Frets · Date · Scale · Metro Mode · BPM · Increment · Meas/Step · Beats/Bar · Time · Time (ms)
+Rating · Exercise · Type · Execution · Box/Frets · Date · Scale · Metro Mode · BPM · Increment · Meas/Step · Beats/Bar · Time · Time (ms)
 
 ## How to use
 
-1. Select exercise type, scale/arpeggio type, and execution mode in the **Executed by** panel (or hit **⚤ Random**)
+1. Select exercise type, scale/arpeggio type, and execution mode in the **Executed by** panel (or hit **💀 Random**)
 2. Set metronome parameters; hit **Change** to get a new fret box if needed
-3. Press **Start** — first random note appears, metronome begins, screen stays on
+3. Press **Start** — first random root note appears, metronome begins, screen stays on
 4. Play in tempo, press **Next Note** (or **Spacebar** on desktop)
 5. Repeat until **12/12**, press **Finish**
 6. Rate the session in the modal, press **Save** → Excel file downloads
@@ -57,7 +57,7 @@ Rating · Exercise (Scales/Arpeggios) · Type · Execution · Box/Frets · Date 
 Automatic enharmonic notation per scale type and root:
 - **Major / Natural Minor** — standard key signatures
 - **Dominant 7th** — one flat more than the corresponding major
-- **Harmonic / Melodic Minor** — natural minor key signature base with raised degrees spelled correctly
+- **Harmonic / Melodic Minor** — natural minor key signature base, raised degrees spelled correctly
 - **Octatonic scales** — jazz-standard mixed notation, hardcoded per root
 
 ## Tech stack
