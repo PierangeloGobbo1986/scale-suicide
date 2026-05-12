@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scale Suicide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#070707;color:#c8c8c8;font-family:'Barlow Condensed','Arial Narrow',sans-serif;min-height:100vh;padding:14px}
+#app{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+
+.panel{background:#0e0e0e;border:1px solid #252525;border-radius:6px;padding:13px 17px}
+.ptitle{font-size:11px;color:#c0c0c0;text-transform:uppercase;letter-spacing:.14em}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+#hdr{text-align:center;padding:6px 0 2px;border-bottom:1px solid #141414}
+#hdr span{font-size:13px;color:#333;letter-spacing:.32em;text-transform:uppercase}
+
+#sw{font-family:'Share Tech Mono',monospace;font-size:56px;font-weight:400;text-align:center;letter-spacing:.06em;color:#666;transition:color .3s}
+#sw.run{color:#00cc33;text-shadow:0 0 30px rgba(0,204,51,.2)}
+#sw.pau{color:#cc7700}
+#sw-st{text-align:center;font-size:11px;color:#777;letter-spacing:.18em;text-transform:uppercase;margin-top:4px}
+
+#note-wrap{background:#090800;border:2px solid #2a2a2a;border-radius:5px;padding:6px 12px;text-align:center;min-width:92px;flex-shrink:0;transition:border-color .3s}
+#note-wrap.act{border-color:#cc6600}
+#note{font-family:'Share Tech Mono',monospace;font-size:48px;font-weight:400;line-height:1;color:#666;transition:color .3s}
+#note.act{color:#cc7700}
+@keyframes noteFlash{from{opacity:.3;transform:scale(1.08)}to{opacity:1;transform:scale(1)}}
+#note.flash{animation:noteFlash .22s ease-out}
+#note-sc{font-size:11px;color:#c0c0c0;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+
+#prog-wrap{background:#080808;border:1px solid #1e1e1e;border-radius:5px;padding:7px 15px;text-align:center;min-width:74px;flex-shrink:0;transition:border-color .3s}
+#prog-wrap.done{border-color:#006622}
+#prog{font-family:'Share Tech Mono',monospace;font-size:22px;color:#666;transition:color .3s;line-height:1.1}
+#prog.act{color:#c0c0c0}#prog.done{color:#00cc33}
+
+.srow{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.slbl{font-size:10px;color:#c0c0c0;text-transform:uppercase;letter-spacing:.08em;width:88px;text-align:right;flex-shrink:0}
+.srow input[type=range]{flex:1;-webkit-appearance:none;appearance:none;background:transparent;outline:none;cursor:pointer}
+.srow input[type=range]::-webkit-slider-runnable-track{background:#181818;height:3px;border-radius:2px}
+.srow input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;background:#00cc33;border-radius:50%;margin-top:-5px;box-shadow:0 0 5px rgba(0,204,51,.4)}
+.srow input[type=range]::-moz-range-track{background:#181818;height:3px;border-radius:2px}
+.srow input[type=range]::-moz-range-thumb{width:13px;height:13px;background:#00cc33;border-radius:50%;border:none}
+.srow input[type=number]{width:60px;background:#080808;border:1px solid #1e1e1e;color:#cc7700;font-family:'Share Tech Mono',monospace;font-size:13px;padding:4px 5px;border-radius:3px;text-align:center;outline:none;-moz-appearance:textfield}
+.srow input[type=number]::-webkit-outer-spin-button,.srow input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+.sunit{font-size:10px;color:#c0c0c0;width:28px;flex-shrink:0}
+
+#beat-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:11px}
+.bbt{width:54px;height:54px;border-radius:5px;border:1px solid #1e1e1e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;background:#080808;transition:background .07s,border-color .07s;font-family:'Share Tech Mono',monospace}
+.bbt[data-s=normal]{border-color:#1a4a22}
+.bbt[data-s=accent]{border-color:#804400;background:#130a00}
+.bbt[data-s=silent]{border-color:#141414;opacity:.4}
+.bbt[data-a=1]{background:#003310;border-color:#00cc33;border-width:2px}
+.bbn{font-size:14px;color:#c0c0c0}
+.bbs{font-size:10px;color:#aaa}
+.bbt[data-s=accent] .bbs{color:#cc7700}
+.bbt[data-s=silent] .bbn,.bbt[data-s=silent] .bbs{color:#2a2a2a}
+.bbt[data-a=1] .bbn,.bbt[data-a=1] .bbs{color:#00cc33}
+
+
+.mbt{font-size:12px;letter-spacing:.06em;padding:5px 14px;border-radius:3px;cursor:pointer;border:1px solid #252525;background:#0a0a0a;color:#555;transition:all .18s;font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-weight:600;text-transform:uppercase}
+.mbt.on{border-color:#005a8a;background:#001a28;color:#2299cc}
+
+#ctrl-r{background:#0a0a0a;border-radius:4px;padding:10px;margin-bottom:8px}
+
+select{background:#080808;border:1px solid #1e1e1e;color:#c0c0c0;padding:8px 10px;border-radius:3px;font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-size:14px;cursor:pointer;outline:none;flex:1;min-width:130px}
+select option{background:#0e0e0e}
+
+.cb{padding:10px 18px;border-radius:4px;cursor:pointer;border:1px solid #252525;background:#0a0a0a;font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;transition:all .18s;min-width:110px}
+.cb:disabled{opacity:.3;cursor:not-allowed}
+.cb.suc{border-color:#1a4a22;color:#00cc33}
+.cb.suc:not(:disabled):hover{background:#0a1f0d}
+.cb.dan{border-color:#4a1a1a;color:#cc3333}
+.cb.dan:not(:disabled):hover{background:#1f0a0a}
+.cb.war{border-color:#4a3300;color:#cc7700}
+.cb.war:not(:disabled):hover{background:#1f1400}
+.cb.neu{border-color:#252525;color:#555}
+.cb.neu:not(:disabled):hover{background:#111}
+
+.acb{padding:5px 10px;border-radius:3px;border:1px solid #1e1e1e;background:#080808;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:16px;transition:all .18s;color:#c0c0c0;min-width:36px;text-align:center}
+.acb.on{border-color:#1a4a22;color:#00cc33;background:#0a1a0d}
+
+#msg{padding:10px 16px;border-radius:5px;font-size:13px;line-height:1.55;display:none;font-family:'Barlow Condensed','Arial Narrow',sans-serif}
+#msg.show{display:block}
+#msg.w{background:#1a0a00;border:1px solid #884400;color:#cc7700}
+#msg.s{background:#001a0a;border:1px solid #006622;color:#00cc33}
+#msg.i{background:#0a0a0a;border:1px solid #222;color:#666}
+#sess-cnt{font-family:'Share Tech Mono',monospace;font-size:11px;color:#777}
+.eye-btn{width:26px;height:26px;border-radius:3px;border:1px solid #1e1e1e;background:#080808;cursor:pointer;color:#c0c0c0;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color .18s,border-color .18s;padding:0}
+.eye-btn:hover{color:#c0c0c0;border-color:#333}
+.eye-btn.open{color:#00cc33;border-color:#1a4a22}
+.acc-lbl{font-size:9px;color:#777;text-transform:uppercase;letter-spacing:.1em;width:36px;flex-shrink:0}
+.acc-txt{font-family:'Share Tech Mono',monospace;font-size:13px;color:#cc7700;letter-spacing:.12em;word-break:break-all}
+
+/* ── Modal ────────────────────────────────────────────────────────────── */
+#modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.82);
+  z-index:1000;
+  align-items:center;justify-content:center;
+  padding:20px;
+}
+#modal-overlay.open{display:flex}
+#modal{
+  background:#0e0e0e;border:1px solid #2a2a2a;border-radius:8px;
+  padding:28px 28px 22px;
+  width:100%;max-width:420px;
+  display:flex;flex-direction:column;gap:20px;
+  box-shadow:0 0 60px rgba(0,0,0,.8);
+}
+#modal-title{
+  font-size:11px;color:#c0c0c0;text-transform:uppercase;letter-spacing:.18em;
+  text-align:center;margin-bottom:4px;
+}
+#modal-question{
+  font-family:'Share Tech Mono',monospace;font-size:22px;color:#c0c0c0;
+  text-align:center;line-height:1.3;
+}
+#modal-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rbt{
+  padding:12px 0;border-radius:4px;cursor:pointer;
+  border:1px solid #252525;background:#080808;
+  font-family:'Barlow Condensed','Arial Narrow',sans-serif;
+  font-weight:700;font-size:15px;letter-spacing:.06em;
+  transition:all .18s;flex:1;min-width:100px;text-align:center;
+  color:#888;
+}
+.rbt:hover{border-color:#333;color:#666}
+.rbt.g.on{border-color:#007733;background:#001a0a;color:#00cc33}
+.rbt.o.on{border-color:#884400;background:#1a0d00;color:#cc7700}
+.rbt.r.on{border-color:#881111;background:#1a0505;color:#cc3333}
+#modal-warn{
+  font-size:12px;color:#884400;text-align:center;
+  min-height:16px;font-family:'Barlow Condensed','Arial Narrow',sans-serif;
+  letter-spacing:.04em;
+}
+#modal-actions{display:flex;gap:10px;justify-content:center}
+#modal-cancel{
+  padding:10px 26px;border-radius:4px;cursor:pointer;
+  border:1px solid #252525;background:#080808;
+  color:#555;font-family:'Barlow Condensed','Arial Narrow',sans-serif;
+  font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
+  transition:all .18s;flex:1;
+}
+#modal-cancel:hover{background:#111;color:#aaa}
+#modal-save{
+  padding:10px 26px;border-radius:4px;cursor:pointer;
+  border:1px solid #1a4a22;background:#0a0a0a;
+  color:#00cc33;font-family:'Barlow Condensed','Arial Narrow',sans-serif;
+  font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
+  transition:all .18s;flex:1;opacity:.35;
+}
+#modal-save.ready{opacity:1}
+#modal-save.ready:hover{background:#0a1f0d}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="hdr"><span>◆ Scale Suicide ◆</span></div>
+
+
+  <div class="panel" style="display:flex;flex-direction:column;gap:9px">
+    <!-- Row 1: Executed by + toggle + random -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#bbb;letter-spacing:.1em;flex-shrink:0">Executed by:</span>
+      <div style="display:flex;gap:7px">
+        <button id="et-sc" class="acb on" onclick="setExerciseType('scales')"    style="font-size:12px;padding:6px 16px;letter-spacing:.06em">Scales</button>
+        <button id="et-ar" class="acb"    onclick="setExerciseType('arpeggios')" style="font-size:12px;padding:6px 16px;letter-spacing:.06em">Arpeggios</button>
+      </div>
+      <button class="acb" onclick="randomizeExercise()" style="font-size:11px;padding:5px 13px;letter-spacing:.05em">💀 Random</button>
+    </div>
+    <!-- Row 2: Type dropdown -->
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:10px;color:#c0c0c0;text-transform:uppercase;letter-spacing:.08em;width:36px;text-align:right;flex-shrink:0">Type</span>
+      <select id="sc-sel" onchange="scaleType=this.value;$('note-sc').textContent=scaleType;updAccidentals()" style="flex:1"></select>
+      <select id="ar-sel" onchange="arpeggioType=this.value;$('note-sc').textContent=arpeggioType" style="flex:1;display:none"></select>
+    </div>
+    <!-- Row 3: Execution mode + optional box position -->
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:10px;color:#c0c0c0;text-transform:uppercase;letter-spacing:.08em;width:36px;text-align:right;flex-shrink:0">Exec</span>
+      <select id="exec-sel" onchange="setExecutionMode(this.value)" style="flex:1;min-width:120px"></select>
+      <div id="box-wrap" style="display:none;align-items:center;gap:6px">
+        <span style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.08em;flex-shrink:0">Frets</span>
+        <select id="box-sel" onchange="boxPosition=this.value" style="width:80px"></select>
+        <button class="acb" onclick="changeBox()" style="font-size:10px;padding:4px 8px;letter-spacing:.04em;flex-shrink:0">Change</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <span class="ptitle">Metronome</span>
+      <div style="display:flex;gap:6px">
+        <button id="mb-st" class="mbt on" onclick="setMetMode('static')">Static</button>
+        <button id="mb-rp" class="mbt"    onclick="setMetMode('ramp')">Ramp</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px">
+        <div id="bpm-disp" style="font-family:'Share Tech Mono',monospace;font-size:48px;color:#cc8800;line-height:1">80</div>
+        <button id="metro-play-btn" onclick="toggleMetro()" class="acb" style="font-size:18px;padding:6px 12px;line-height:1;flex-shrink:0;border-color:#1a4a22;color:#00cc33">▶</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:2px">
+        <span style="font-size:10px;color:#aaa">BPM</span>
+        <span style="font-size:10px;color:#888">·</span>
+        <span id="tempo-nm" style="font-size:10px;color:#c0c0c0;font-style:italic">Andante</span>
+      </div>
+    </div>
+
+    <div id="ctrl-s">
+      <div class="srow">
+        <span class="slbl">BPM</span>
+        <input type="range" id="sl-sb" min="20" max="280" value="80"
+          oninput="sBpm=+this.value;$('num-sb').value=sBpm;if(metMode==='static'){liveBpm=sBpm;updBpm()}">
+        <input type="number" id="num-sb" min="20" max="280" value="80"
+          oninput="sBpm=clamp(+this.value,20,280);$('sl-sb').value=sBpm;if(metMode==='static'){liveBpm=sBpm;updBpm()}">
+        <span class="sunit">bpm</span>
+      </div>
+    </div>
+
+    <div id="ctrl-r" style="display:none">
+      <div class="srow">
+        <span class="slbl">Start BPM</span>
+        <input type="range" id="sl-rs" min="20" max="280" value="60"
+          oninput="rStart=+this.value;$('num-rs').value=rStart">
+        <input type="number" id="num-rs" min="20" max="280" value="60"
+          oninput="rStart=clamp(+this.value,20,280);$('sl-rs').value=rStart">
+        <span class="sunit">bpm</span>
+      </div>
+      <div class="srow">
+        <span class="slbl">End BPM</span>
+        <input type="range" id="sl-re" min="20" max="280" value="160"
+          oninput="rEnd=+this.value;$('num-re').value=rEnd">
+        <input type="number" id="num-re" min="20" max="280" value="160"
+          oninput="rEnd=clamp(+this.value,20,280);$('sl-re').value=rEnd">
+        <span class="sunit">bpm</span>
+      </div>
+      <div class="srow">
+        <span class="slbl">Increment</span>
+        <input type="range" id="sl-ri" min="1" max="30" value="5"
+          oninput="rStep=+this.value;$('num-ri').value=rStep">
+        <input type="number" id="num-ri" min="1" max="30" value="5"
+          oninput="rStep=clamp(+this.value,1,30);$('sl-ri').value=rStep">
+        <span class="sunit">bpm</span>
+      </div>
+      <div class="srow">
+        <span class="slbl">Meas / Step</span>
+        <input type="range" id="sl-rm" min="1" max="32" value="4"
+          oninput="rMeas=+this.value;$('num-rm').value=rMeas">
+        <input type="number" id="num-rm" min="1" max="32" value="4"
+          oninput="rMeas=clamp(+this.value,1,32);$('sl-rm').value=rMeas">
+        <span class="sunit">meas</span>
+      </div>
+    </div>
+
+    <div class="srow">
+      <span class="slbl">Beats / Bar</span>
+      <input type="range" id="sl-bm" min="1" max="8" value="4"
+        oninput="setBpM(+this.value);$('num-bm').value=bpM">
+      <input type="number" id="num-bm" min="1" max="8" value="4"
+        oninput="setBpM(clamp(+this.value,1,8));$('sl-bm').value=bpM">
+      <span class="sunit">beats</span>
+    </div>
+    <div id="beat-btns"></div>
+  </div>
+
+  <div class="panel" style="text-align:center;padding:14px 0 10px">
+    <div id="sw">00:00.00</div>
+    <div id="sw-st">ready</div>
+  </div>
+
+  <div class="panel">
+    <div class="row" style="margin-bottom:0;justify-content:center">
+      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;justify-content:center">
+        <button id="bn-5th" class="acb" onclick="setNoteOrder('fifths')"  style="font-size:10px;padding:5px 8px;letter-spacing:.03em">Cr.5ths</button>
+        <button id="bn-4th" class="acb" onclick="setNoteOrder('fourths')" style="font-size:10px;padding:5px 8px;letter-spacing:.03em">Cr.4ths</button>
+      </div>
+      <div id="note-wrap">
+        <div id="note">—</div>
+        <div id="note-sc">Major</div>
+        <div id="box-disp" style="font-size:11px;color:#c0c0c0;letter-spacing:.08em;margin-top:2px;display:none"></div>
+      </div>
+      <div id="prog-wrap">
+        <div id="prog">0/12</div>
+        <div style="font-size:10px;color:#777;text-transform:uppercase;letter-spacing:.1em">progress</div>
+      </div>
+    </div>
+    <div id="acc-panel" style="border-top:1px solid #161616;margin-top:10px;padding-top:9px">
+      <div style="display:flex;align-items:flex-start;gap:8px;justify-content:center">
+        <button id="eye-btn" onclick="toggleEye()" title="Show / hide accidentals" class="eye-btn open"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
+            <span class="acc-lbl">COF</span>
+            <div id="acc-cof" class="acc-txt">—</div>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <span class="acc-lbl">Scale</span>
+            <div id="acc-scale" class="acc-txt">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+    <button id="btn-st" class="cb suc"  onclick="handleStartPause()">Start</button>
+    <button id="btn-nx" class="cb suc"  onclick="handleNext()"        disabled>Next note</button>
+    <button id="btn-sp" class="cb dan"  onclick="handleStop()"        disabled>Stop</button>
+    <button id="btn-sv" class="cb suc"  onclick="handleSave()"        disabled>Save</button>
+    <button id="btn-rs" class="cb neu"  onclick="handleReset()">Reset</button>
+  </div>
+
+  <div class="panel row" style="justify-content:space-between">
+    <span class="ptitle">Session log</span>
+    <span id="sess-cnt"></span>
+    <button class="cb neu" style="min-width:auto;padding:5px 12px;font-size:11px" onclick="clearHistory()">Clear log</button>
+  </div>
+
+  <div id="msg"></div>
+
+</div>
+
+<!-- ── Modal ─────────────────────────────────────────────────────────────── -->
+<div id="modal-overlay" onclick="overlayClick(event)">
+  <div id="modal">
+    <div>
+      <div id="modal-title">Session complete</div>
+      <div id="modal-question">Did you survive?</div>
+    </div>
+    <div id="modal-btns">
+      <button class="rbt g" onclick="pickRating('great')">Whooohooo</button>
+      <button class="rbt o" onclick="pickRating('ok')">OK</button>
+      <button class="rbt r" onclick="pickRating('nah')">Nah</button>
+    </div>
+    <div id="modal-warn"></div>
+    <div id="modal-actions">
+      <button id="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button id="modal-save"   onclick="confirmSave()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Constants ──────────────────────────────────────────────────────────────
+const ST=['Major','Dominant 7th','Natural Minor','Harmonic Minor','Melodic Minor','Whole-Half','Half-Whole'];
+const ARP_TYPES=['Maj7','7','min7','min7b5','dim7','minMaj7','Maj7♯5','7sus4','Maj6','min6'];
+const SCALE_EXEC=['Box','3 notes/string','2 notes/string','4 notes/string'];
+const ARP_EXEC=['Box','Diatonic approach ↓','Diatonic approach ↑','Diatonic enclosure','Chromatic approach ↓','Chromatic approach ↑','Chromatic enclosure','Pivot','Triplet'];
+const BOX_POS=['0-4 (open)','1-5','2-6','3-7','4-8','5-9','6-10','7-11','8-12','9-13','10-14','11-15','12-16'];
+const ROOTS_AUTO=['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+const COF5_AUTO=['C','G','D','A','E','B','F#','Db','Ab','Eb','Bb','F'];
+const COF4_AUTO=['C','F','Bb','Eb','Ab','Db','F#','B','E','A','D','G'];
+const BCYC=['normal','accent','silent'];
+const RLBL={great:'Whooohooo',ok:'OK',nah:'Nah'};
+const RCOL={great:'FF00AA44',ok:'FFFF8800',nah:'FFCC2200'};
+
+// ── Utils ──────────────────────────────────────────────────────────────────
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,isNaN(v)?a:v));
+function fmtT(ms){
+  const s=Math.floor(ms/1000);
+  return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')+'.'+String(Math.floor((ms%1000)/10)).padStart(2,'0');
+}
+function tname(b){return b<60?'Largo':b<76?'Adagio':b<108?'Andante':b<120?'Moderato':b<156?'Allegro':b<176?'Vivace':b<200?'Presto':'Prestissimo'}
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+
+// ── State ──────────────────────────────────────────────────────────────────
+let status='idle',notes=[],noteIdx=0,scaleType='Major',arpeggioType='Maj7',executionMode='Box',boxPosition='1-5',noteOrder='random',exerciseType='scales';
+let elapsedMs=0,swTimer=null,swStartAt=0,swSaved=0,finalTime=0;
+let metMode='static',metroPlaying=false,sBpm=80,rStart=60,rEnd=160,rStep=5,rMeas=4,bpM=4;
+let beatStates=['normal','normal','normal','normal'];
+let actx=null,metRun=false,metTmr=null,metNext=0,metBeat=0,metMeasDone=0,metCurBpm=120;
+let liveBpm=80,activeBeat=-1;
+let silentEl=null,clickBufs={normal:null,accent:null},wakeLock=null;
+let modalRating=null;
+let history=[];
+let beatEls=[];
+
+// ── Init ───────────────────────────────────────────────────────────────────
+ST.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;$('sc-sel').appendChild(o);});
+ARP_TYPES.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;$('ar-sel').appendChild(o);});
+BOX_POS.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;$('box-sel').appendChild(o);});
+loadHist(); initBeatBtns(); updBpm(); updAll();
+updExerciseUI();
+
+// ── Wake Lock (keeps screen on while practicing) ──────────────────────────
+async function requestWakeLock(){
+  if(!('wakeLock' in navigator)) return;
+  try{
+    wakeLock=await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release',()=>{wakeLock=null;});
+  }catch(e){}
+}
+function releaseWakeLock(){
+  if(wakeLock){wakeLock.release();wakeLock=null;}
+}
+// Re-acquire lock if user returns to the page mid-session
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&status==='running') requestWakeLock();
+});
+
+// ── Audio engine ───────────────────────────────────────────────────────────
+function getCtx(){
+  if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)();
+  if(actx.state==='suspended') actx.resume();
+  return actx;
+}
+
+// A silent WAV blob URL. Playing it via <audio> forces iOS to switch its
+// AVAudioSession to the "Playback" category, which is NOT muted by the
+// silent switch. Web Audio shares that session and also bypasses the switch.
+function makeSilentWavUrl(){
+  const sr=8000, ns=8000; // 1s · 8kHz · 8-bit mono ≈ 8 KB
+  const b=new ArrayBuffer(44+ns), v=new DataView(b);
+  const ws=(o,s)=>[...s].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));
+  ws(0,'RIFF'); v.setUint32(4,36+ns,true);
+  ws(8,'WAVE'); ws(12,'fmt '); v.setUint32(16,16,true);
+  v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr,true);
+  v.setUint16(32,1,true);  v.setUint16(34,8,true);
+  ws(36,'data'); v.setUint32(40,ns,true);
+  new Uint8Array(b,44,ns).fill(128); // 8-bit silence = 128
+  return URL.createObjectURL(new Blob([b],{type:'audio/wav'}));
+}
+
+// Pre-synthesize click sounds once as AudioBuffers (decaying sine wave).
+// Reusing pre-allocated buffers avoids GC pressure during the scheduler loop,
+// which keeps timing tight at fast tempos and over long sessions.
+function makeClickBuf(ctx,freq,decayMs,amp){
+  const sr=ctx.sampleRate, ns=Math.ceil(sr*decayMs/1000);
+  const buf=ctx.createBuffer(1,ns,sr), d=buf.getChannelData(0);
+  const tau=decayMs/1000/4;
+  for(let i=0;i<ns;i++){const t=i/sr; d[i]=Math.sin(2*Math.PI*freq*t)*Math.exp(-t/tau)*amp;}
+  return buf;
+}
+function initClickBufs(){
+  const ctx=getCtx();
+  clickBufs.normal=makeClickBuf(ctx,880,80,0.45);
+  clickBufs.accent=makeClickBuf(ctx,1500,100,0.85);
+}
+
+function unlockAudio(){
+  const ctx=getCtx();
+  if(!clickBufs.normal) initClickBufs();
+  // Silent Web Audio buffer — unlocks the AudioContext
+  const sb=ctx.createBuffer(1,1,ctx.sampleRate);
+  const ss=ctx.createBufferSource();
+  ss.buffer=sb; ss.connect(ctx.destination); ss.start(0);
+  // Silent looping <audio> — holds iOS AVAudioSession in Playback category
+  // so the silent switch is ignored for the entire session
+  if(!silentEl){
+    silentEl=document.createElement('audio');
+    silentEl.src=makeSilentWavUrl();
+    silentEl.loop=true; silentEl.volume=0.001;
+    document.body.appendChild(silentEl);
+  }
+  silentEl.play().catch(()=>{});
+}
+
+function playClick(t,type){
+  if(type==='silent') return;
+  const ctx=getCtx();
+  const buf=type==='accent'?clickBufs.accent:clickBufs.normal;
+  if(!buf) return;
+  const src=ctx.createBufferSource();
+  src.buffer=buf; src.connect(ctx.destination); src.start(t);
+}
+function runSched(){
+  if(!metRun) return;
+  const ctx=getCtx();
+  while(metNext<ctx.currentTime+.12){
+    const b=metBeat;
+    const bs=b<beatStates.length?beatStates[b]:'normal';
+    playClick(metNext,bs);
+    const d=Math.max(0,(metNext-ctx.currentTime)*1000);
+    (function(cb,cd){setTimeout(()=>flashBeat(cb),cd);})(b,d);
+    if(metMode==='static') metCurBpm=sBpm;
+    metBeat=(b+1)%Math.max(1,bpM);
+    metNext+=60/metCurBpm;
+    if(metBeat===0&&metMode==='ramp'){
+      metMeasDone++;
+      if(metMeasDone>=rMeas){
+        metMeasDone=0;
+        if(metCurBpm<rEnd){
+          metCurBpm=Math.min(metCurBpm+rStep,rEnd);
+          const nb=Math.round(metCurBpm);
+          (function(v,cd){setTimeout(()=>{liveBpm=v;updBpm();},cd);})(nb,d);
+        }
+      }
+    }
+  }
+  metTmr=setTimeout(runSched,25);
+}
+function startMet(){
+  metRun=true; metBeat=0; metMeasDone=0;
+  metCurBpm=metMode==='ramp'?rStart:sBpm;
+  liveBpm=Math.round(metCurBpm); updBpm();
+  const ctx=getCtx(); metNext=ctx.currentTime+.08; runSched();
+}
+function stopMet(){metRun=false;clearTimeout(metTmr);activeBeat=-1;refreshBtns();}
+
+// ── Stopwatch ──────────────────────────────────────────────────────────────
+function startSW(){swStartAt=Date.now()-swSaved;swTimer=setInterval(()=>{elapsedMs=Date.now()-swStartAt;updSW();},50);}
+function pauseSW(){clearInterval(swTimer);swSaved=Date.now()-swStartAt;}
+function resetSW(){clearInterval(swTimer);swSaved=0;elapsedMs=0;}
+
+// ── Beat buttons ───────────────────────────────────────────────────────────
+function initBeatBtns(){
+  const c=$('beat-btns');c.innerHTML='';beatEls=[];
+  for(let i=0;i<bpM;i++){
+    const btn=document.createElement('button');
+    btn.className='bbt';
+    btn.innerHTML='<span class="bbn">'+(i+1)+'</span><span class="bbs"></span>';
+    btn.addEventListener('click',(function(idx){return function(){cycleBeat(idx);};})(i));
+    c.appendChild(btn);beatEls.push(btn);
+  }
+  refreshBtns();
+}
+function refreshBtns(){
+  beatEls.forEach((btn,i)=>{
+    if(i>=beatStates.length) return;
+    const bs=beatStates[i];
+    btn.dataset.s=bs; btn.dataset.a=(activeBeat===i)?'1':'0';
+    btn.querySelector('.bbs').textContent=bs==='silent'?'−':bs==='accent'?'△':'●';
+  });
+}
+function flashBeat(idx){activeBeat=idx;refreshBtns();setTimeout(()=>{activeBeat=-1;refreshBtns();},115);}
+function cycleBeat(i){const c=BCYC.indexOf(beatStates[i]);beatStates[i]=BCYC[(c+1)%3];refreshBtns();}
+function setBpM(v){
+  v=clamp(v,1,8);bpM=v;
+  const ns=Array(v).fill('normal');
+  for(let i=1;i<Math.min(beatStates.length,v);i++)ns[i]=beatStates[i];
+  beatStates=ns;initBeatBtns();
+}
+
+// ── UI updates ─────────────────────────────────────────────────────────────
+function updBpm(){
+  $('bpm-disp').textContent=Math.round(liveBpm);
+  $('bpm-disp').style.color=status==='running'?'#00cc33':'#cc8800';
+  $('tempo-nm').textContent=tname(liveBpm);
+}
+function updSW(){
+  const sw=$('sw'),st=$('sw-st');
+  sw.textContent=fmtT(elapsedMs);
+  sw.className=status==='running'?'run':status==='paused'?'pau':'';
+  st.textContent=status==='completed'?'final: '+fmtT(finalTime):status==='paused'?'paused':status==='running'?'running':'ready';
+}
+// ── Music theory ─────────────────────────────────────────────────────────
+const LTRS=['C','D','E','F','G','A','B'];
+const LTS={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+const SIV={
+  'Major':         [0,2,4,5,7,9,11],
+  'Dominant 7th':  [0,2,4,5,7,9,10],
+  'Natural Minor': [0,2,3,5,7,8,10],
+  'Harmonic Minor':[0,2,3,5,7,8,11],
+  'Melodic Minor': [0,2,3,5,7,9,11],
+  'Whole-Half':    [0,2,3,5,6,8,9,11],
+  'Half-Whole':    [0,1,3,4,6,7,9,10],
+};
+const COF_SH=[6,1,8,3,10,5,0]; // F# C# G# D# A# E# B#  (sharp COF order)
+const COF_FL=[10,3,8,1,6,11,4];// Bb Eb Ab Db Gb Cb Fb   (flat  COF order)
+
+// Octatonic lookup tables – jazz-standard notation, verified against intervals
+const OCT_WH={
+  C:['C','D','Eb','F','Gb','Ab','A','B'],   Db:['Db','Eb','E','Gb','G','A','Bb','C'],
+  D:['D','E','F','G','Ab','Bb','B','C#'],   Eb:['Eb','F','Gb','Ab','A','B','C','D'],
+  E:['E','F#','G','A','Bb','C','Db','Eb'],   F:['F','G','Ab','Bb','B','Db','D','E'],
+  'F#':['F#','G#','A','B','C','D','Eb','F'], G:['G','A','Bb','C','Db','Eb','E','F#'],
+  Ab:['Ab','Bb','B','Db','D','E','F','G'],   A:['A','B','C','D','Eb','F','Gb','Ab'],
+  Bb:['Bb','C','Db','Eb','E','Gb','G','A'],  B:['B','C#','D','E','F','G','Ab','Bb'],
+};
+const OCT_HW={
+  C:['C','Db','Eb','E','F#','G','A','Bb'],   Db:['Db','D','E','F','G','Ab','Bb','B'],
+  D:['D','Eb','F','F#','Ab','A','B','C'],    Eb:['Eb','E','F#','G','A','Bb','C','Db'],
+  E:['E','F','G','Ab','Bb','B','C#','D'],     F:['F','Gb','Ab','A','B','C','D','Eb'],
+  'F#':['F#','G','A','Bb','C','Db','Eb','F'],  G:['G','Ab','Bb','B','C#','D','E','F'],
+  Ab:['Ab','A','B','C','D','Eb','F','Gb'],    A:['A','Bb','C','Db','Eb','E','F#','G'],
+  Bb:['Bb','B','C#','D','E','F','G','Ab'],    B:['B','C','D','Eb','F','Gb','Ab','Bb'],
+};
+
+function noteS(n){return((LTS[n[0]]||0)+(n[1]==='#'?1:n[1]==='b'?-1:0)+12)%12;}
+function spellNote(li,s){
+  const l=LTRS[li%7],nat=LTS[l],d=((s-nat)+12)%12;
+  return l+(d===0?'':d===1?'#':d===11?'b':d===2?'x':'bb');
+}
+
+// Key-signature arithmetic: returns #>0 or b<0 for major scale at given semitone
+function majKeySig(rs){return[0,-5,2,-3,4,-1,6,1,-4,3,-2,5][rs];}
+// True = use sharp COF order; false = use flat COF order
+function isSharpKey(root,st){
+  const rs=noteS(root);
+  let sig;
+  if(st==='Major')            sig=majKeySig(rs);
+  else if(st==='Dominant 7th')sig=majKeySig(rs)-1;
+  else if(st==='Natural Minor'||st==='Harmonic Minor'||st==='Melodic Minor')
+                              sig=majKeySig((rs+3)%12);
+  else                        sig=majKeySig(rs); // octatonic: heuristic
+  return sig>=0;
+}
+
+function getScaleNotes(root,st){
+  if(st==='Whole-Half'){const t=OCT_WH[root]||OCT_WH['C'];return t.map((name,i)=>({name,s:noteS(name),i}));}
+  if(st==='Half-Whole'){const t=OCT_HW[root]||OCT_HW['C'];return t.map((name,i)=>({name,s:noteS(name),i}));}
+  const iv=SIV[st]||SIV['Major'], rs=noteS(root), li=LTRS.indexOf(root[0]);
+  return iv.map((v,i)=>{const s=(rs+v)%12;return{name:spellNote(li+i,s),s,i};});
+}
+
+function computeAccidentals(root){
+  if(!root||root==='—') return{cof:[],scale:[]};
+  const sharp=isSharpKey(root,scaleType);
+  const scaleNotes=getScaleNotes(root,scaleType);
+  const accs=scaleNotes.filter(n=>n.name.includes('#')||n.name.includes('b'));
+  const cofOrd=sharp?COF_SH:COF_FL;
+  const cof=[...accs].sort((a,b)=>{
+    const ai=cofOrd.indexOf(a.s),bi=cofOrd.indexOf(b.s);
+    return(ai<0?99:ai)-(bi<0?99:bi);
+  }).map(n=>n.name);
+  return{cof,scale:accs.map(n=>n.name)};
+}
+
+// Eye toggle
+let eyeOpen=true;
+const EYE_O=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const EYE_C=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+function mask(s){return s.replace(/[^\s]/g,'•');}
+function toggleEye(){
+  eyeOpen=!eyeOpen;
+  $('eye-btn').innerHTML=eyeOpen?EYE_O:EYE_C;
+  $('eye-btn').classList.toggle('open',eyeOpen);
+  updAccidentals();
+}
+function updAccidentals(){
+  const root=(status!=='idle'&&notes.length)?notes[noteIdx]:null;
+  if(!root||exerciseType==='arpeggios'){$('acc-cof').textContent='—';$('acc-scale').textContent='—';return;}
+  const{cof,scale}=computeAccidentals(root);
+  const cofStr=cof.length?cof.join('  '):'none';
+  const scStr=scale.length?scale.join('  '):'none';
+  $('acc-cof').textContent=eyeOpen?cofStr:mask(cofStr);
+  $('acc-scale').textContent=eyeOpen?scStr:mask(scStr);
+}
+
+function updNote(){
+  const n=(status!=='idle'&&notes.length)?notes[noteIdx]:'—';
+  const el=$('note');
+  if(el.textContent!==n&&status!=='idle'){
+    el.textContent=n;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+  } else {el.textContent=n;}
+  el.classList.toggle('act',status!=='idle');
+  $('note-wrap').classList.toggle('act',status!=='idle');
+  $('note-sc').textContent=exerciseType==='scales'?scaleType:arpeggioType;
+  const p=$('prog'),pw=$('prog-wrap'),done=status==='completed';
+  p.textContent=status==='idle'?'0/12':`${noteIdx+1}/12`;
+  p.className=done?'done':status!=='idle'?'act':'';
+  pw.classList.toggle('done',done);
+}
+function updBtns(){
+  const run=status==='running',pau=status==='paused',done=status==='completed',idle=status==='idle';
+  $('btn-st').textContent=run?'Pause':pau?'Resume':'Start';
+  $('btn-st').className='cb '+(run?'war':pau?'suc':'suc');
+  $('btn-nx').disabled=!run;
+  $('btn-nx').textContent=(noteIdx===11&&run)?'Finish':'Next note';
+  $('btn-sp').disabled=idle;
+  $('btn-sv').disabled=!done;
+  updBpm();
+}
+function setExerciseType(t){
+  exerciseType=t;
+  $('et-sc').classList.toggle('on',t==='scales');
+  $('et-ar').classList.toggle('on',t==='arpeggios');
+  updExerciseUI();
+}
+function updExerciseUI(){
+  const isSc=exerciseType==='scales';
+  $('sc-sel').style.display=isSc?'':'none';
+  $('ar-sel').style.display=isSc?'none':'';
+  const modes=isSc?SCALE_EXEC:ARP_EXEC;
+  const sel=$('exec-sel'); sel.innerHTML='';
+  modes.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;sel.appendChild(o);});
+  if(modes.includes(executionMode)) sel.value=executionMode;
+  else{executionMode=modes[0]; sel.value=modes[0];}
+  $('note-sc').textContent=isSc?scaleType:arpeggioType;
+  updBoxDisplay();
+}
+function setExecutionMode(m){
+  executionMode=m;
+  updBoxDisplay();
+}
+function updBoxDisplay(){
+  const showBox=exerciseType==='arpeggios'||(exerciseType==='scales'&&executionMode==='Box');
+  const el=$('box-wrap');
+  if(!el) return;
+  el.style.display=showBox?'flex':'none';
+  if(showBox){
+    const sel=$('box-sel');
+    if(sel&&!sel.value){boxPosition=BOX_POS[Math.floor(Math.random()*BOX_POS.length)];sel.value=boxPosition;}
+  }
+}
+function randomizeExercise(){
+  const modes=exerciseType==='scales'?SCALE_EXEC:ARP_EXEC;
+  executionMode=modes[Math.floor(Math.random()*modes.length)];
+  $('exec-sel').value=executionMode;
+  const showBox=executionMode==='Box'||exerciseType==='arpeggios';
+  $('box-wrap').style.display=showBox?'flex':'none';
+  if(showBox){boxPosition=BOX_POS[Math.floor(Math.random()*BOX_POS.length)];if($('box-sel'))$('box-sel').value=boxPosition;}
+  if(exerciseType==='scales'){
+    scaleType=ST[Math.floor(Math.random()*ST.length)];
+    $('sc-sel').value=scaleType;
+    $('note-sc').textContent=scaleType;
+    updAccidentals();
+  } else {
+    arpeggioType=ARP_TYPES[Math.floor(Math.random()*ARP_TYPES.length)];
+    $('ar-sel').value=arpeggioType;
+    $('note-sc').textContent=arpeggioType;
+  }
+  if(executionMode==='Box'||exerciseType==='arpeggios'){
+    boxPosition=BOX_POS[Math.floor(Math.random()*BOX_POS.length)];
+  }
+}
+function updAll(){updSW();updNote();updBtns();updAccidentals();updBoxDisplay();}
+
+// ── Settings ───────────────────────────────────────────────────────────────
+
+function setNoteOrder(o){
+  if(status!=='idle') return;
+  noteOrder=(noteOrder===o)?'random':o;
+  $('bn-5th').classList.toggle('on',noteOrder==='fifths');
+  $('bn-4th').classList.toggle('on',noteOrder==='fourths');
+}
+function getNoteSeq(){
+  if(noteOrder==='fifths')  return [...COF5_AUTO];
+  if(noteOrder==='fourths') return [...COF4_AUTO];
+  return shuffle([...ROOTS_AUTO]);
+}
+function changeBox(){
+  boxPosition=BOX_POS[Math.floor(Math.random()*BOX_POS.length)];
+  if($('box-sel'))$('box-sel').value=boxPosition;
+}
+function toggleMetro(){
+  if(status==='running') return; // session has priority
+  if(metroPlaying){
+    metroPlaying=false; stopMet(); updMetroBtn();
+  } else {
+    unlockAudio();
+    metroPlaying=true; startMet(); updMetroBtn();
+  }
+}
+function updMetroBtn(){
+  const btn=$('metro-play-btn');
+  if(!btn) return;
+  btn.textContent=metroPlaying?'⏹':'▶';
+  btn.style.borderColor=metroPlaying?'#4a1a1a':'#1a4a22';
+  btn.style.color=metroPlaying?'#cc3333':'#00cc33';
+}
+function setMetMode(m){
+  metMode=m;
+  $('mb-st').classList.toggle('on',m==='static');
+  $('mb-rp').classList.toggle('on',m==='ramp');
+  $('ctrl-s').style.display=m==='static'?'':'none';
+  $('ctrl-r').style.display=m==='ramp'?'':'none';
+  liveBpm=m==='static'?sBpm:rStart;updBpm();
+}
+
+// ── Wake Lock (keep screen on during session) ────────────────────────────
+async function requestWakeLock(){
+  if(!('wakeLock' in navigator)) return;
+  try{
+    wakeLock=await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release',()=>{wakeLock=null; updWakeLock();});
+    updWakeLock();
+  }catch(e){}
+}
+function releaseWakeLock(){
+  if(wakeLock){wakeLock.release(); wakeLock=null;}
+  updWakeLock();
+}
+function updWakeLock(){
+  const el=$('wakelock-ind');
+  if(!el) return;
+  const active=!!wakeLock;
+  el.textContent=active?'● screen on':'';
+  el.style.color=active?'#1a4a22':'transparent';
+}
+// Re-acquire after returning from background (iOS releases it automatically)
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&status==='running') requestWakeLock();
+});
+
+// ── Session control ────────────────────────────────────────────────────────
+function handleStartPause(){
+  if(status==='idle'||status==='completed'){
+    unlockAudio(); // must be synchronous in user gesture — unlocks iOS audio
+    requestWakeLock();
+    if(metroPlaying){metroPlaying=false;updMetroBtn();}
+    stopMet();resetSW();
+    notes=getNoteSeq();
+    noteIdx=0;
+    if(exerciseType==='arpeggios'||(exerciseType==='scales'&&executionMode==='Box')) boxPosition=BOX_POS[Math.floor(Math.random()*BOX_POS.length)];status='running';showMsg('');updAll();
+    setTimeout(()=>{startSW();startMet();},55);
+  } else if(status==='running'){
+    status='paused';pauseSW();stopMet();updAll();
+    showMsg('Paused. Press Resume to continue.','i');
+  } else if(status==='paused'){
+    unlockAudio(); // also needed on resume after iOS may have re-suspended
+    requestWakeLock();
+    status='running';showMsg('');updAll();
+    setTimeout(()=>{startSW();startMet();},40);
+  }
+}
+function handleNext(){
+  if(status!=='running') return;
+  if(noteIdx<11){noteIdx++;updAll();}
+  else{
+    stopMet();pauseSW();releaseWakeLock();
+    finalTime=Date.now()-swStartAt;
+    status='completed';updAll();
+    showMsg('All 12 scales done! Press Save to log this session.','i');
+  }
+}
+function handleStop(){
+  releaseWakeLock();
+  metroPlaying=false;updMetroBtn();
+  stopMet();resetSW();
+  status='idle';notes=[];noteIdx=0;finalTime=0;
+  showMsg('Stopped.','i');updAll();
+}
+function handleReset(){
+  releaseWakeLock();
+  metroPlaying=false;updMetroBtn();
+  stopMet();resetSW();
+  status='idle';notes=[];noteIdx=0;finalTime=0;
+  showMsg('');updAll();
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────
+function handleSave(){
+  if(status!=='completed') return;
+  modalRating=null;
+  document.querySelectorAll('.rbt').forEach(b=>b.classList.remove('on'));
+  $('modal-warn').textContent='';
+  $('modal-save').classList.remove('ready');
+  $('modal-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function pickRating(r){
+  modalRating=r;
+  document.querySelectorAll('.rbt').forEach(b=>b.classList.remove('on'));
+  document.querySelector('.rbt.'+({great:'g',ok:'o',nah:'r'}[r])).classList.add('on');
+  $('modal-warn').textContent='';
+  $('modal-save').classList.add('ready');
+}
+function closeModal(){
+  $('modal-overlay').classList.remove('open');
+  document.body.style.overflow='';
+  modalRating=null;
+}
+function overlayClick(e){if(e.target===$('modal-overlay'))closeModal();}
+
+async function confirmSave(){
+  if(!modalRating){
+    $('modal-warn').textContent='Please select a rating before saving.';
+    return;
+  }
+  const savedRating=modalRating; // capture BEFORE closeModal() resets it to null
+  closeModal();
+  const t=finalTime||elapsedMs;
+  const entry={
+    date:new Date().toLocaleString('it-IT'),
+    rating:savedRating,exerciseType,
+    subType:exerciseType==='scales'?scaleType:arpeggioType,
+    executionMode,boxPosition:executionMode==='Box'?boxPosition:'—',
+    scaleType,metMode,
+    bpm:metMode==='static'?String(sBpm):`${rStart}→${rEnd}`,
+    increment:metMode==='ramp'?String(rStep):'—',
+    measPerStep:metMode==='ramp'?String(rMeas):'—',
+    beatsPerBar:String(bpM),time:fmtT(t),timeMs:t
+  };
+  const newH=[...history,entry];
+  history=newH;
+  try{localStorage.setItem('ss_history',JSON.stringify(newH));}catch(e){}
+  $('sess-cnt').textContent=newH.length+' session'+(newH.length>1?'s':'');
+  showMsg('Generating Excel file…','i');
+
+  try{
+    const ExcelJS=await loadXL();
+    const wb=new ExcelJS.Workbook();
+    const ws=wb.addWorksheet('Scale Suicide Log',{views:[{state:'frozen',ySplit:1}]});
+    ws.columns=[
+      {header:'Rating',     key:'rating',     width:16},
+      {header:'Exercise',   key:'exerciseType',width:12},
+      {header:'Type',       key:'subType',     width:16},
+      {header:'Execution',  key:'executionMode',width:22},
+      {header:'Box/Frets',  key:'boxPosition', width:12},
+      {header:'Date',       key:'date',        width:22},
+      {header:'Scale',      key:'scaleType',   width:18},
+      {header:'Metro Mode', key:'metMode',     width:12},
+      {header:'BPM',        key:'bpm',         width:14},
+      {header:'Increment',  key:'increment',   width:12},
+      {header:'Meas/Step',  key:'measPerStep', width:12},
+      {header:'Beats/Bar',  key:'beatsPerBar', width:12},
+      {header:'Time',       key:'time',        width:12},
+      {header:'Time (ms)',  key:'timeMs',      width:12}
+    ];
+    ws.getRow(1).eachCell(c=>{
+      c.font={bold:true,color:{argb:'FFFFFFFF'}};
+      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF111111'}};
+      c.alignment={horizontal:'center'};
+    });
+    newH.forEach(e=>{
+      const rLabel=RLBL[e.rating]||'—';
+      const rColor=RCOL[e.rating]||'FF444444';
+      const row=ws.addRow({...e,rating:rLabel});
+      const c1=row.getCell(1);
+      c1.fill={type:'pattern',pattern:'solid',fgColor:{argb:rColor}};
+      c1.font={bold:true,color:{argb:'FFFFFFFF'}};
+      c1.alignment={horizontal:'center'};
+    });
+    const buf=await wb.xlsx.writeBuffer();
+    dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'scale_suicide_log.xlsx');
+    showMsg('Saved! '+newH.length+' session'+(newH.length>1?'s':'')+' logged — "scale_suicide_log.xlsx" downloaded.','s');
+  }catch(err){
+    const hdr='Rating,Exercise,Type,Execution,Box,Date,Scale,Metro Mode,BPM,Increment,Meas/Step,Beats/Bar,Time,Time(ms)';
+    const rows=newH.map(e=>[RLBL[e.rating]||e.rating,e.exerciseType||'scales',e.subType||e.scaleType||'',e.executionMode||'',e.boxPosition||'',e.date,e.scaleType||'',e.metMode,e.bpm,e.increment,e.measPerStep,e.beatsPerBar,e.time,e.timeMs].join(','));
+    dlBlob(new Blob([[hdr,...rows].join('\n')],{type:'text/csv'}),'scale_suicide_log.csv');
+    showMsg('Saved! '+newH.length+' session'+(newH.length>1?'s':'')+' logged — downloaded as CSV (Excel CDN unavailable).','s');
+  }
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function showMsg(txt,cls){
+  const m=$('msg');
+  if(!txt){m.className='';m.textContent='';return;}
+  m.textContent=txt;m.className='show '+(cls||'i');
+}
+function dlBlob(blob,name){
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+function loadXL(){
+  return new Promise((res,rej)=>{
+    if(window.ExcelJS) return res(window.ExcelJS);
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js';
+    s.onload=()=>window.ExcelJS?res(window.ExcelJS):rej(new Error('Not found'));
+    s.onerror=()=>rej(new Error('Load failed'));
+    document.head.appendChild(s);
+  });
+}
+function clearHistory(){
+  if(!confirm('Clear all saved session history? This cannot be undone.')) return;
+  history=[];
+  try{localStorage.removeItem('ss_history');}catch(e){}
+  $('sess-cnt').textContent='';
+  showMsg('Session history cleared.','i');
+}
+function loadHist(){
+  try{const d=localStorage.getItem('ss_history');if(d){history=JSON.parse(d);$('sess-cnt').textContent=history.length+' session'+(history.length>1?'s':'');}}catch(e){}
+}
+
+// ── Keyboard shortcut (Space = Next note) ─────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'&&e.target===document.body){e.preventDefault();handleNext();}
+});
+</script>
+</body>
+</html>
