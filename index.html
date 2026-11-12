@@ -112,8 +112,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
 .genbtn:hover:not(:disabled){background:#241a00}
 .genbtn:disabled{opacity:.4}
 
-/* Stopwatch */
-.sw-panel{text-align:center;padding:14px 0 10px}
+/* Timed exercise: stopwatch and session buttons */
+.timed{text-align:center;padding-top:14px}
 #sw{font-family:var(--mono);font-size:56px;text-align:center;letter-spacing:.06em;color:#666;transition:color .3s}
 #sw.run{color:var(--green);text-shadow:0 0 30px rgba(0,204,51,.2)}
 #sw.pau{color:var(--amber)}
@@ -143,20 +143,21 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
 #prog.done{color:var(--green)}
 .progl{font-size:10px;color:#777;text-transform:uppercase;letter-spacing:.08em}
 #acc-panel{border-top:1px solid var(--line2);margin-top:12px;padding-top:10px;display:flex;align-items:center;justify-content:center;gap:10px}
+.fnext{min-width:56px;flex-shrink:0}
 .accrows{display:flex;flex-direction:column;gap:5px;min-width:0;flex:0 1 auto}
 .accrow>.acc-txt{min-width:0}
 .accrow{display:flex;align-items:baseline;gap:8px}
-.acc-lbl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;width:50px;flex-shrink:0}
+.acc-lbl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;width:58px;flex-shrink:0;white-space:nowrap}
 .acc-txt{font-family:var(--mono);font-size:15px;color:var(--yellow);word-spacing:.3em;line-height:1.4}
-#rel-key-wrap{background:#090800;border:1.5px solid #1e1e1e;border-radius:4px;padding:6px 10px;text-align:center;flex-shrink:0;transition:border-color .3s}
-#rel-key-wrap.act{border-color:#8a6410}
-#rel-key{font-family:var(--mono);font-size:22px;color:#3a3a3a;line-height:1;transition:color .3s}
-#rel-key-wrap.act #rel-key{color:var(--yellow)}
-.rel-l{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.msc{display:flex;align-items:baseline;justify-content:center;gap:10px;width:100%;max-width:360px;margin:14px auto 0;padding:10px 16px;border-radius:5px;border:1px solid #2a2a2a;background:#080808;color:#8a8a8a;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;transition:border-color .15s,color .15s,background .15s}
+.msc.on{border-color:#1f6a32;background:#0a1a0d;color:var(--green)}
+.msc-bpm{font-family:var(--mono);font-size:13px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--faint)}
+.msc.on .msc-bpm{color:var(--green)}
+.msc:disabled{opacity:.4}
 
 /* Session controls and log */
-.ctrls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.cb{padding:10px 18px;border-radius:4px;border:1px solid #252525;background:#0a0a0a;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;transition:all .15s;min-width:110px}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.cb{padding:10px 14px;border-radius:4px;border:1px solid #252525;background:#0a0a0a;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;transition:all .15s;min-width:96px}
 .cb:disabled{opacity:.3}
 .cb.suc{border-color:#1a4a22;color:var(--green)}
 .cb.suc:not(:disabled):hover{background:#0a1f0d}
@@ -166,6 +167,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
 .cb.war:not(:disabled):hover{background:#1f1400}
 .cb.neu{border-color:#2a2a2a;color:#888}
 .cb.neu:not(:disabled):hover{background:#111}
+.cb.sav{border-color:#1d4660;color:#6cc3ee}
+.cb.sav:not(:disabled):hover{background:#0a1d2a}
 .cb.small{min-width:auto;padding:6px 12px;font-size:11px}
 .logrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .logbtns{display:flex;gap:8px;margin-left:auto}
@@ -192,6 +195,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
   .ex-sub{font-size:18px}
 }
 @media (max-width:350px){
+  #hdr .brand{letter-spacing:.06em;font-size:11px}
+  .updbtn{padding:6px 8px;font-size:12px}
+  #prog-wrap{padding:6px 5px;min-width:54px}
+  .progl{font-size:9px;letter-spacing:.02em}
+  .circb{padding:5px 5px}
   .bbt{width:44px;height:44px}
   #beat-btns{gap:5px}
   .beat-row{gap:8px}
@@ -263,11 +271,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
     <button id="btn-rand" class="genbtn" type="button">&#128128; Generate Exercise</button>
   </section>
 
-  <section class="panel sw-panel" aria-label="Stopwatch">
-    <div id="sw">00:00.00</div>
-    <div id="sw-st">ready</div>
-  </section>
-
   <section class="panel" aria-label="Current exercise">
     <div id="ex-title" aria-live="polite">
       <div id="ex-l1"></div>
@@ -287,21 +290,30 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
       <div id="prog-wrap"><div id="prog">0/12</div><div class="progl">progress</div></div>
     </div>
     <div id="acc-panel">
+      <button id="btn-fnext" class="rnote fnext" type="button" title="Next root on the selected circle, without timer">Next<br>note</button>
       <button id="eye-btn" class="eye-btn open" type="button" aria-pressed="true" title="Show or hide the notes"></button>
       <div class="accrows">
         <div class="accrow"><span class="acc-lbl" id="acc-lbl1">COF</span><div id="acc-cof" class="acc-txt">&mdash;</div></div>
         <div class="accrow"><span class="acc-lbl" id="acc-lbl2">Scale</span><div id="acc-scale" class="acc-txt">&mdash;</div></div>
+        <div class="accrow" id="rel-row"><span class="acc-lbl">Maj. Rel.</span><div id="rel-key" class="acc-txt">&mdash;</div></div>
       </div>
-      <div id="rel-key-wrap"><div id="rel-key">&mdash;</div><div class="rel-l">Maj. Rel.</div></div>
+    </div>
+    <button id="btn-msc" class="msc" type="button" aria-pressed="false"><span id="msc-lbl">Metronome: OFF</span><span id="msc-bpm" class="msc-bpm">80 BPM</span></button>
+  </section>
+
+  <section class="panel timed" aria-label="Timed exercise">
+    <div id="sw">00:00.00</div>
+    <div id="sw-st">ready</div>
+    <div class="ctrls">
+      <button id="btn-st" class="cb suc" type="button">Start</button>
+      <button id="btn-nx" class="cb suc" type="button" disabled>Next note</button>
+      <button id="btn-sp" class="cb dan" type="button" disabled>Stop</button>
+      <button id="btn-rs" class="cb neu" type="button">Reset</button>
+      <button id="btn-sv" class="cb sav" type="button" disabled>Save</button>
     </div>
   </section>
 
-  <section class="panel ctrls" aria-label="Session controls">
-    <button id="btn-st" class="cb suc" type="button">Start</button>
-    <button id="btn-nx" class="cb suc" type="button" disabled>Next note</button>
-    <button id="btn-sp" class="cb dan" type="button" disabled>Stop</button>
-    <button id="btn-rs" class="cb neu" type="button">Reset</button>
-  </section>
+  <div id="msg" role="status" aria-live="polite"></div>
 
   <section class="panel logrow" aria-label="Session log">
     <span class="ptitle">Session log<span id="sess-cnt"></span></span>
@@ -312,18 +324,16 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
   </section>
 
-  <div id="msg" role="status" aria-live="polite"></div>
-
 </div>
 
 <script>
 'use strict';
-const APP_VERSION='2.1.0';
+const APP_VERSION='2.2.0';
 
 // ── Exercise catalogue ─────────────────────────────────────────────────────
 const SCALE_TYPES=['Major','Major Bebop','Dominant 7th','Dominant Bebop','Natural Minor','Minor Bebop','Harmonic Minor','Melodic Minor','Chromatic Jazz','Whole-Half','Half-Whole'];
 const ARP_TYPES=['Maj7','7','min7','min7b5','dim7','minMaj7','Maj7\u266F5','7sus4','Maj6','min6'];
-const SCALE_EXEC=['3 notes/string','2 notes/string','4 notes/string','Box'];      // one fingering per exercise
+const SCALE_EXEC=['2 notes/string','3 notes/string','4 notes/string','Box'];      // one fingering per exercise
 const ARP_EXEC=['Chromatic approach \u2191','CA + Triplet & landing','Diatonic approach \u2193','Enclosure 4 notes','Pivot'];
 const ARP_POS=['Box','Along a string'];                                          // combines with the technique
 const BOX_POS=['0-4 (open)','1-5','2-6','3-7','4-8','5-9','6-10','7-11','8-12','9-13','10-14','11-15','12-16'];
@@ -487,6 +497,7 @@ let silentEl=null;
 const clickBufs={normal:null,accent:null};
 let wakeLock=null,wantWake=false;
 let sessHist=[],beatEls=[];
+let unsaved=0,saving=false;   // finished exercises not yet written to the log file
 
 const isLocked=()=>status==='running'||status==='paused';
 
@@ -615,15 +626,12 @@ function updNote(){
   p.className=done?'done':(status!=='idle'?'act':'');
   $('prog-wrap').classList.toggle('done',done);
 }
-function setRel(note){
-  $('rel-key').textContent=note||'\u2014';
-  $('rel-key-wrap').classList.toggle('act',!!note);
-}
+function setRel(note){$('rel-key').textContent=note||'\u2014';}
 function updTheory(){
   const ex=curEx(),r=curRoot(ex),isArp=(ex?ex.cat:exCat)==='arpeggios';
   $('acc-lbl1').textContent=isArp?'Formula':'COF';
   $('acc-lbl2').textContent=isArp?'Chord':'Scale';
-  $('rel-key-wrap').hidden=isArp;
+  $('rel-row').hidden=isArp;
   if(!ex||!r){$('acc-cof').textContent='\u2014';$('acc-scale').textContent='\u2014';setRel(null);return;}
   const notes=exerciseNotes(ex.cat,ex.type,r);
   let row1,rel=null;
@@ -645,6 +653,7 @@ function updBpm(){
   if(document.activeElement!==inp) inp.value=String(Math.round(liveBpm));
   inp.classList.toggle('run',metRun);
   $('tempo-nm').textContent=tname(liveBpm);
+  $('msc-bpm').textContent=Math.round(liveBpm)+' BPM';
 }
 function updBtns(){
   const run=status==='running',pau=status==='paused',idle=status==='idle',done=status==='completed',locked=run||pau;
@@ -654,11 +663,14 @@ function updBtns(){
   st.className='cb '+(run?'war':'suc');
   st.disabled=(idle||done)&&!def;
   $('btn-nx').disabled=!run;
-  $('btn-nx').textContent=(noteIdx===11&&run)?'Save':'Next note';
+  $('btn-nx').textContent=(noteIdx===11&&run)?'Finish':'Next note';
   $('btn-sp').disabled=idle;
   ['et-sc','et-ar','btn-rand','bn-5th','bn-4th','btn-chg'].forEach(id=>{$(id).disabled=locked;});
   $('btn-rnote').disabled=locked||!def;
+  $('btn-fnext').disabled=locked||!def;
   $('metro-play-btn').disabled=locked;
+  $('btn-msc').disabled=locked;
+  updSaveBtn();
   [['bn-5th','fifths'],['bn-4th','fourths']].forEach(([id,o])=>{
     $(id).classList.toggle('on',noteOrder===o);$(id).setAttribute('aria-pressed',noteOrder===o?'true':'false');
   });
@@ -695,6 +707,15 @@ function randomNote(){
   let p;
   do{p=Math.floor(Math.random()*12);}while(p===freePc);
   freePc=p;updAll();
+}
+// Free practice: next root on the selected circle, from the note on screen (C if none)
+function freeNext(){
+  if(isLocked()) return;
+  leaveCompleted();
+  if(!curEx()) return;
+  const circ=noteOrder==='fourths'?CIRC4:CIRC5;
+  freePc=freePc===null?circ[0]:circ[(circ.indexOf(freePc)+1)%12];
+  updAll();
 }
 function toggleEye(){
   eyeOpen=!eyeOpen;
@@ -809,10 +830,12 @@ function startMet(){
   metCurBpm=metMode==='ramp'?rStart:sBpm;
   liveBpm=Math.round(metCurBpm);updBpm();
   metNext=getCtx().currentTime+0.08;runSched();
+  updMetroBtn();
 }
 function stopMet(){
   metRun=false;clearTimeout(metTmr);activeBeat=-1;refreshBeatBtns();bcPending=false;showBar(-1,false);
   liveBpm=metMode==='ramp'?rStart:sBpm;updBpm();
+  updMetroBtn();
 }
 // pos: bar within the phrase (0-based), -1 = metronome stopped; hidden: silent bar with the eye closed
 function showBar(pos,hidden){
@@ -841,6 +864,10 @@ function updMetroBtn(){
   b.textContent=metroPlaying?'\u23F9\uFE0E':'\u25B6\uFE0E';
   b.classList.toggle('stop',metroPlaying);
   b.setAttribute('aria-label',metroPlaying?'Stop the metronome':'Start the metronome');
+  // shortcut in the note card: shows whether the metronome is sounding
+  const m=$('btn-msc');
+  m.classList.toggle('on',metRun);m.setAttribute('aria-pressed',metRun?'true':'false');
+  $('msc-lbl').textContent='Metronome: '+(metRun?'ON':'OFF');
 }
 
 // ── Metronome settings ─────────────────────────────────────────────────────
@@ -950,7 +977,7 @@ function handleNext(){
   stopMet();pauseSW();releaseWakeLock();
   finalTime=swSaved;
   status='completed';updAll();
-  saveSession();
+  recordSession();
 }
 function endSession(){
   releaseWakeLock();
@@ -1011,10 +1038,22 @@ function exportRow(e){
   };
 }
 function persistHist(){
-  try{localStorage.setItem('ss_history',JSON.stringify(sessHist));}catch(e){}
-  $('sess-cnt').textContent=sessHist.length?sessHist.length+' session'+(sessHist.length>1?'s':''):'';
+  try{
+    localStorage.setItem('ss_history',JSON.stringify(sessHist));
+    localStorage.setItem('ss_unsaved',String(unsaved));
+  }catch(e){}
+  $('sess-cnt').textContent=sessHist.length?plural(sessHist.length,'session'):'';
+  updSaveBtn();
 }
-async function saveSession(){
+const plural=(n,w)=>n+' '+w+(n===1?'':'s');
+// Save is enabled while finished exercises are waiting to be written to the log file
+function updSaveBtn(){
+  const b=$('btn-sv');
+  b.textContent=unsaved>0?'Save ('+unsaved+')':'Save';
+  b.disabled=unsaved===0||saving||isLocked();
+}
+// End of a timed exercise: score it and keep it in the app (it survives reloads); Save writes the file
+function recordSession(){
   const t=finalTime||elapsedMs,ex=sessEx;
   const{rating,isNewPB,pb,ratio}=computeAutoRating(t,ex.type);
   sessHist.push({
@@ -1031,8 +1070,16 @@ async function saveSession(){
     pbTime:pb===null?'\u2014':fmtT(pb),
     vsPb:pb===null?'NEW':((ratio>=1?'+':'')+Math.round((ratio-1)*100)+'%')
   });
+  unsaved++;
   persistHist();
   const feedback=buildFeedbackMsg(rating,isNewPB,t,pb,ratio),cls=rating==='great'?'s':rating==='ok'?'i':'w';
+  showMsg(feedback+' Press Save to write '+(unsaved===1?'it':'all '+unsaved+' exercises')+' to the log file.',cls);
+}
+// Writes the whole history (all sessions, not only the new ones) to scale_suicide_log.xlsx
+async function saveLog(){
+  if(unsaved===0||saving||isLocked()) return;
+  saving=true;updSaveBtn();
+  const added=unsaved,total=plural(sessHist.length,'session');
   showMsg('Generating the Excel file\u2026','i');
   try{
     const ExcelJS=await loadXL();
@@ -1052,12 +1099,16 @@ async function saveSession(){
     });
     const buf=await wb.xlsx.writeBuffer();
     dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'scale_suicide_log.xlsx');
-    showMsg(feedback+' "scale_suicide_log.xlsx" downloaded.',cls);
+    unsaved=Math.max(0,unsaved-added);
+    showMsg(`Log saved: "scale_suicide_log.xlsx" with ${total} (${added} new).`,'s');
   }catch(err){
-    const csvCell=v=>{const s=String(v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+    const csvCell=v=>{const t=String(v);return /[",\n]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t;};
     const rows=[XL_COLS.map(c=>c[0]).join(',')].concat(sessHist.map(e=>{const r=exportRow(e);return XL_COLS.map(c=>csvCell(r[c[1]])).join(',');}));
     dlBlob(new Blob([rows.join('\n')],{type:'text/csv'}),'scale_suicide_log.csv');
-    showMsg(feedback+' Excel was unavailable, so the log downloaded as CSV.',cls);
+    unsaved=Math.max(0,unsaved-added);
+    showMsg(`Excel was unavailable, so the log downloaded as "scale_suicide_log.csv" with ${total} (${added} new).`,'w');
+  }finally{
+    saving=false;persistHist();
   }
 }
 
@@ -1103,13 +1154,14 @@ async function importHistory(file){
       });
     });
     if(!imported.length){showMsg('No valid rows found in that file.','w');return;}
-    if(!confirm(`This file contains ${imported.length} session${imported.length>1?'s':''}. Importing replaces your current history (${sessHist.length} session${sessHist.length===1?'':'s'}) with the file. Continue?`)){
+    const lost=unsaved>0?` ${plural(unsaved,'exercise')} not yet saved to a file will be lost.`:'';
+    if(!confirm(`This file contains ${plural(imported.length,'session')}. Importing replaces your current history (${plural(sessHist.length,'session')}) with the file.${lost} Continue?`)){
       showMsg('Import cancelled.','i');return;
     }
     imported.sort((a,b)=>parseItDate(a.date)-parseItDate(b.date));
     imported.forEach(e=>{if(!e.position) delete e.position;});
     backfillPB(imported);
-    sessHist=imported;
+    sessHist=imported;unsaved=0;
     persistHist();
     showMsg(`Import complete: history replaced with ${sessHist.length} session${sessHist.length>1?'s':''} from the file.`,'s');
   }catch(err){
@@ -1117,9 +1169,9 @@ async function importHistory(file){
   }
 }
 function clearHistory(){
-  if(!confirm('Clear all saved session history? This cannot be undone.')) return;
-  sessHist=[];
-  try{localStorage.removeItem('ss_history');}catch(e){}
+  const lost=unsaved>0?` ${plural(unsaved,'exercise')} not yet saved to a file will be lost too.`:'';
+  if(!confirm('Clear all saved session history? This cannot be undone.'+lost)) return;
+  sessHist=[];unsaved=0;
   persistHist();
   showMsg('Session history cleared.','i');
 }
@@ -1127,7 +1179,8 @@ function loadHist(){
   try{
     const d=localStorage.getItem('ss_history');
     if(d){sessHist=JSON.parse(d);if(!Array.isArray(sessHist)) sessHist=[];backfillPB(sessHist);}
-  }catch(e){sessHist=[];}
+    unsaved=clamp(parseInt(localStorage.getItem('ss_unsaved'),10)||0,0,sessHist.length);
+  }catch(e){sessHist=[];unsaved=0;}
   persistHist();
 }
 
@@ -1194,23 +1247,30 @@ function init(){
   $('bn-5th').addEventListener('click',()=>setNoteOrder('fifths'));
   $('bn-4th').addEventListener('click',()=>setNoteOrder('fourths'));
   $('eye-btn').addEventListener('click',toggleEye);
+  $('btn-fnext').addEventListener('click',freeNext);
+  $('btn-msc').addEventListener('click',toggleMetro);
 
   $('btn-st').addEventListener('click',handleStartPause);
   $('btn-nx').addEventListener('click',handleNext);
   $('btn-sp').addEventListener('click',handleStop);
   $('btn-rs').addEventListener('click',handleReset);
+  $('btn-sv').addEventListener('click',saveLog);
   $('btn-imp').addEventListener('click',()=>$('import-file-input').click());
   $('import-file-input').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(f) importHistory(f);});
   $('btn-clr').addEventListener('click',clearHistory);
 
-  // Space = Next note during a timed session (desktop)
+  // Space = Next note (desktop): the timed one during a session, the free one otherwise
   document.addEventListener('keydown',e=>{
-    if(e.code!=='Space'||status!=='running') return;
+    if(e.code!=='Space') return;
     const t=e.target;
     if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA')) return;
-    e.preventDefault();
-    if(document.activeElement&&document.activeElement!==document.body) document.activeElement.blur();
-    handleNext();
+    if(status==='running'){
+      e.preventDefault();
+      if(document.activeElement&&document.activeElement!==document.body) document.activeElement.blur();
+      handleNext();
+    }else if(!isLocked()&&(t===document.body||t===document.documentElement)){
+      e.preventDefault();freeNext();
+    }
   });
 
   initBeatBtns();

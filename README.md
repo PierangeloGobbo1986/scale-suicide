@@ -2,16 +2,18 @@
 
 A practice tool for scales and arpeggios in all 12 keys. Inspired by the basketball conditioning drill of the same name: sprint through the 12 keys, survive. It runs a precise Web Audio metronome, times each session, scores it against your Personal Best and keeps a cumulative Excel log. No install, no server. On iPhone it works as a home-screen app.
 
-**Current version: 2.1.0** (shown at the top right of the app)
+**Current version: 2.2.0** (shown at the top right of the app)
 
 ## How a session works
 
-Pick an exercise, set the metronome, press **Start**. The app shows the 12 roots one at a time following the circle of fifths or fourths; play the scale or arpeggio on each root and press **Next note**. At 12/12 the button becomes **Save**: the session is scored and the Excel log downloads.
+Pick an exercise, set the metronome, press **Start**. The app shows the 12 roots one at a time following the circle of fifths or fourths; play the scale or arpeggio on each root and press **Next note**. At 12/12 the button becomes **Finish**: the session is scored and kept in the app. Do as many exercises as you like, then press **Save** once to download the log with all of them.
+
+For free practice without timer or log, use **Next note** and **Random note** in the note card.
 
 ## Metronome (top card)
 
 - **Tempo**: tap the big BPM number and type the value (numeric keypad on iPhone). The value is applied when you leave the field, so the tempo never jumps while typing. Range 20 to 280, default 80.
-- **▶ / ⏹** runs the metronome on its own, without a session.
+- **▶ / ⏹** runs the metronome on its own, without a session. The same switch is repeated in the note card (**Metronome: ON/OFF**), so you don't have to scroll back up.
 - **Beats/bar** (1 to 8). Beat buttons cycle normal ● → accent △ → silent −. Accents on 2 and 4 by default.
 - **Mute bars**: 0 means off, every bar plays and Play bars shows ALL. With Mute bars above 0 the metronome plays *Play bars* bars, then stays silent for *Mute bars* bars, and repeats: a drill for your internal pulse.
 - **Eye**: open, the beat buttons keep flashing during the silent bars; closed, full blackout.
@@ -26,7 +28,7 @@ Pick an exercise, set the metronome, press **Start**. The app shows the 12 roots
 | Row | Scales | Arpeggios |
 |---|---|---|
 | Type | Major, Major Bebop, Dominant 7th, Dominant Bebop, Natural Minor, Minor Bebop, Harmonic Minor, Melodic Minor, Chromatic Jazz, Whole-Half, Half-Whole | Maj7, 7, min7, min7b5, dim7, minMaj7, Maj7♯5, 7sus4, Maj6, min6 |
-| Exec | 3, 2 or 4 notes/string, Box | Chromatic approach ↑, CA + Triplet & landing, Diatonic approach ↓, Enclosure 4 notes, Pivot |
+| Exec | 2, 3 or 4 notes/string, Box | Chromatic approach ↑, CA + Triplet & landing, Diatonic approach ↓, Enclosure 4 notes, Pivot |
 | Position | | Box, Along a string |
 
 - One option on per row defines the exercise directly. With several options on, the big **💀 Generate Exercise** button at the bottom of the card draws one combination among them, never the same one twice in a row.
@@ -39,11 +41,19 @@ Pick an exercise, set the metronome, press **Start**. The app shows the 12 roots
 
 - The exercise is written in large yellow text at the top, one line each for type, execution and position; when a box is in play, its frets appear right below with a **Change** button (e.g. *min7b5 arpeggio*, *Enclosure 4 notes*, *Box: frets 5–9 [Change]*).
 - **Cr.5ths / Cr.4ths** set the order of the 12 roots for the timed session (default Cr.5ths).
-- **Random note** shows a random root with its notes for free practice anywhere on the neck. It does not start the timer and is not saved.
-- **Progress** counts 0/12 to 12/12.
+- Free practice, no timer and nothing saved:
+  - **Random note** shows a random root with its notes, anywhere on the neck.
+  - **Next note** (left of the eye) moves to the next root on the selected circle, starting from the note on screen (C if none). Mix the two freely: after a random note, Next note continues the circle from there.
+  - **Metronome: ON/OFF** at the bottom of the card starts and stops the metronome and shows the tempo.
+- **Progress** counts 0/12 to 12/12 in a timed exercise.
 - Theory rows (the eye hides them for self-testing):
   - Scales: **COF** lists the accidentals in circle-of-fifths order (for Chromatic Jazz, the key signature of the major key); **Scale** lists the notes; **Maj. Rel.** shows the relative major for minor scales, the parent major for Dominant 7th and Dominant Bebop (a fourth up) and for Minor Bebop (a whole step down).
   - Arpeggios: **Formula** (e.g. 1 b3 5 b7) and **Chord** (the chord tones).
+- On a computer, **Space** works as Next note: the timed one during a session, the free one otherwise.
+
+## Timed exercise (stopwatch card)
+
+The stopwatch and the session buttons share one card: **Start** (then Pause/Resume), **Next note** (Finish at 12/12), **Stop**, **Reset**, **Save**. Free-practice buttons and the metronome shortcut are locked while a timed exercise runs.
 
 ## Notation
 
@@ -79,7 +89,9 @@ Chromatic Jazz climbs chromatically and reaches the 4th and the octave through t
 
 ## Session log
 
-- History is stored in the browser (localStorage) and the full log downloads as `scale_suicide_log.xlsx` after every session (CSV if Excel is unavailable).
+- Every finished exercise is scored and stored in the browser (localStorage) right away. Nothing is downloaded automatically.
+- **Save** becomes active when exercises are waiting and shows how many (e.g. *Save (3)*). It downloads the full log, all sessions ever recorded, as `scale_suicide_log.xlsx` (CSV if Excel is unavailable).
+- Waiting exercises survive reloads, Update app and closing the app. Only Clear log, Import history or clearing Safari's website data remove them, and Clear log and Import warn you first.
 - Columns: Rating · Exercise · Type · Execution · Position · Note Order · Box/Frets · PB time · vs PB · Date · Metro Mode · BPM · Increment · Meas/Step · Beats/Bar · Play/Mute bars · Time · Time (ms)
 - **Import history** loads an Excel log and replaces the current history (after confirmation). Missing PB time and vs PB values are rebuilt in chronological order.
 - **Clear log** deletes the history.
@@ -103,6 +115,13 @@ Chromatic Jazz climbs chromatically and reaches the 4th and the octave through t
 Single HTML file, vanilla JavaScript, no build step. Web Audio look-ahead scheduler with pre-synthesized clicks, Screen Wake Lock, ExcelJS loaded from a CDN when saving, localStorage for history.
 
 ## Version history
+
+**2.2.0** (November 2026)
+- The log is no longer downloaded at the end of each exercise: a **Save** button after Reset downloads everything that is waiting, in one file.
+- Stopwatch moved into the card with the session buttons; the last Next note is now labelled Finish.
+- Note card: **Next note** for free practice on the circles, **Metronome: ON/OFF** shortcut with the current tempo; Maj. Rel. is now a third theory row, to leave room for the notes.
+- Scale executions listed in order: 2, 3, 4 notes/string, Box.
+- Layout fixes for 320 px screens (header and progress box).
 
 **2.1.0** (September 2026)
 - Bar Counter for 4, 8 and 16-bar phrases, linked to Mute bars and the eye.
