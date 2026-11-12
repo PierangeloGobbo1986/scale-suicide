@@ -2,7 +2,7 @@
 
 A practice tool for scales and arpeggios in all 12 keys. Inspired by the basketball conditioning drill of the same name: sprint through the 12 keys, survive. It runs a precise Web Audio metronome, times each session, scores it against your Personal Best and keeps a cumulative Excel log. No install, no server. On iPhone it works as a home-screen app.
 
-**Current version: 2.2.0** (shown at the top right of the app)
+**Current version: 2.2.1** (shown at the top right of the app)
 
 ## How a session works
 
@@ -13,7 +13,7 @@ For free practice without timer or log, use **Next note** and **Random note** in
 ## Metronome (top card)
 
 - **Tempo**: tap the big BPM number and type the value (numeric keypad on iPhone). The value is applied when you leave the field, so the tempo never jumps while typing. Range 20 to 280, default 80.
-- **▶ / ⏹** runs the metronome on its own, without a session. The same switch is repeated in the note card (**Metronome: ON/OFF**), so you don't have to scroll back up.
+- **▶ / ⏹** runs the metronome on its own, without a session. The same switch, with its own tempo field, is repeated in the note card (**Metronome: ON/OFF**), so you don't have to scroll back up.
 - **Beats/bar** (1 to 8). Beat buttons cycle normal ● → accent △ → silent −. Accents on 2 and 4 by default.
 - **Mute bars**: 0 means off, every bar plays and Play bars shows ALL. With Mute bars above 0 the metronome plays *Play bars* bars, then stays silent for *Mute bars* bars, and repeats: a drill for your internal pulse.
 - **Eye**: open, the beat buttons keep flashing during the silent bars; closed, full blackout.
@@ -43,8 +43,8 @@ For free practice without timer or log, use **Next note** and **Random note** in
 - **Cr.5ths / Cr.4ths** set the order of the 12 roots for the timed session (default Cr.5ths).
 - Free practice, no timer and nothing saved:
   - **Random note** shows a random root with its notes, anywhere on the neck.
-  - **Next note** (left of the eye) moves to the next root on the selected circle, starting from the note on screen (C if none). Mix the two freely: after a random note, Next note continues the circle from there.
-  - **Metronome: ON/OFF** at the bottom of the card starts and stops the metronome and shows the tempo.
+  - **Next note** (under Random note) moves to the next root on the selected circle, starting from the note on screen (C if none). Mix the two freely: after a random note, Next note continues the circle from there.
+  - **Metronome: ON/OFF** at the bottom of the card starts and stops the metronome. The number beside it is the tempo: tap it to type a new BPM, applied when you leave the field. It always matches the big number at the top; in Ramp it is read-only and shows the live tempo.
 - **Progress** counts 0/12 to 12/12 in a timed exercise.
 - Theory rows (the eye hides them for self-testing):
   - Scales: **COF** lists the accidentals in circle-of-fifths order (for Chromatic Jazz, the key signature of the major key); **Scale** lists the notes; **Maj. Rel.** shows the relative major for minor scales, the parent major for Dominant 7th and Dominant Bebop (a fourth up) and for Minor Bebop (a whole step down).
@@ -115,6 +115,10 @@ Chromatic Jazz climbs chromatically and reaches the 4th and the octave through t
 Single HTML file, vanilla JavaScript, no build step. Web Audio look-ahead scheduler with pre-synthesized clicks, Screen Wake Lock, ExcelJS loaded from a CDN when saving, localStorage for history.
 
 ## Version history
+
+**2.2.1** (November 2026)
+- Next note sits under Random note, sharing its colour and width, like Cr.5ths and Cr.4ths.
+- Tempo field in the Metronome: ON/OFF bar of the note card.
 
 **2.2.0** (November 2026)
 - The log is no longer downloaded at the end of each exercise: a **Save** button after Reset downloads everything that is waiting, in one file.

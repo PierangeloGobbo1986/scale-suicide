@@ -126,7 +126,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
 #ex-title.empty #ex-l1{color:#7a7a7a;font-size:24px}
 #ex-title.empty .ex-sub{color:#6a6a6a;font-size:16px;font-weight:400}
 .note-grid{display:grid;grid-template-columns:auto auto minmax(76px,1fr) auto;gap:8px;align-items:stretch}
-.rnote{min-width:64px;border:1px solid #6a4c0c;background:#140e02;color:var(--yellow);border-radius:5px;padding:6px 8px;font-weight:700;font-size:14px;letter-spacing:.03em;text-transform:uppercase;line-height:1.15;white-space:nowrap}
+.rstack{display:flex;flex-direction:column;gap:6px}
+.rnote{flex:1;min-width:64px;border:1px solid #6a4c0c;background:#140e02;color:var(--yellow);border-radius:5px;padding:4px 8px;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase;line-height:1.05;white-space:nowrap}
 .rnote:disabled{opacity:.35}
 .circ{display:flex;flex-direction:column;gap:6px}
 .circb{flex:1;font-family:var(--cond);font-weight:600;font-size:15px;padding:5px 9px}
@@ -143,17 +144,23 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
 #prog.done{color:var(--green)}
 .progl{font-size:10px;color:#777;text-transform:uppercase;letter-spacing:.08em}
 #acc-panel{border-top:1px solid var(--line2);margin-top:12px;padding-top:10px;display:flex;align-items:center;justify-content:center;gap:10px}
-.fnext{min-width:56px;flex-shrink:0}
 .accrows{display:flex;flex-direction:column;gap:5px;min-width:0;flex:0 1 auto}
 .accrow>.acc-txt{min-width:0}
 .accrow{display:flex;align-items:baseline;gap:8px}
 .acc-lbl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;width:58px;flex-shrink:0;white-space:nowrap}
 .acc-txt{font-family:var(--mono);font-size:15px;color:var(--yellow);word-spacing:.3em;line-height:1.4}
-.msc{display:flex;align-items:baseline;justify-content:center;gap:10px;width:100%;max-width:360px;margin:14px auto 0;padding:10px 16px;border-radius:5px;border:1px solid #2a2a2a;background:#080808;color:#8a8a8a;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;transition:border-color .15s,color .15s,background .15s}
-.msc.on{border-color:#1f6a32;background:#0a1a0d;color:var(--green)}
-.msc-bpm{font-family:var(--mono);font-size:13px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--faint)}
-.msc.on .msc-bpm{color:var(--green)}
+.msc-bar{display:flex;align-items:stretch;width:100%;max-width:360px;margin:14px auto 0;border:1px solid #2a2a2a;border-radius:5px;background:#080808;overflow:hidden;transition:border-color .15s,background .15s}
+.msc-bar.on{border-color:#1f6a32;background:#0a1a0d}
+.msc{flex:1;min-width:0;padding:10px 12px;border:none;background:transparent;color:#8a8a8a;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;transition:color .15s}
+.msc-bar.on .msc{color:var(--green)}
 .msc:disabled{opacity:.4}
+.msc-tempo{display:flex;align-items:center;gap:5px;padding:0 12px 0 10px;border-left:1px solid #2a2a2a;cursor:text}
+.msc-bar.on .msc-tempo{border-left-color:#1f6a32}
+.msc-in{width:3.4ch;font-family:var(--mono);font-size:18px;color:var(--amber);background:transparent;border:none;border-bottom:1px dashed #3d3d3d;border-radius:0;text-align:center;padding:2px 0;-webkit-appearance:none;appearance:none;caret-color:var(--amber)}
+.msc-in:focus{outline:none;border-bottom:1px solid var(--amber)}
+.msc-in[readonly]{border-bottom-color:transparent}
+.msc-bar.on .msc-in{color:var(--green)}
+.msc-u{font-family:var(--mono);font-size:12px;color:var(--faint)}
 
 /* Session controls and log */
 .ctrls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
@@ -281,7 +288,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
       <button id="btn-chg" class="acb small" type="button">Change</button>
     </div>
     <div class="note-grid">
-      <button id="btn-rnote" class="rnote" type="button">Random<br>note</button>
+      <div class="rstack" role="group" aria-label="Free practice">
+        <button id="btn-rnote" class="rnote" type="button">Random<br>note</button>
+        <button id="btn-fnext" class="rnote" type="button" title="Next root on the selected circle, without timer">Next<br>note</button>
+      </div>
       <div class="circ" role="group" aria-label="Order of the 12 notes">
         <button id="bn-5th" class="acb circb on" type="button" aria-pressed="true">Cr.5ths</button>
         <button id="bn-4th" class="acb circb" type="button" aria-pressed="false">Cr.4ths</button>
@@ -290,7 +300,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
       <div id="prog-wrap"><div id="prog">0/12</div><div class="progl">progress</div></div>
     </div>
     <div id="acc-panel">
-      <button id="btn-fnext" class="rnote fnext" type="button" title="Next root on the selected circle, without timer">Next<br>note</button>
       <button id="eye-btn" class="eye-btn open" type="button" aria-pressed="true" title="Show or hide the notes"></button>
       <div class="accrows">
         <div class="accrow"><span class="acc-lbl" id="acc-lbl1">COF</span><div id="acc-cof" class="acc-txt">&mdash;</div></div>
@@ -298,7 +307,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
         <div class="accrow" id="rel-row"><span class="acc-lbl">Maj. Rel.</span><div id="rel-key" class="acc-txt">&mdash;</div></div>
       </div>
     </div>
-    <button id="btn-msc" class="msc" type="button" aria-pressed="false"><span id="msc-lbl">Metronome: OFF</span><span id="msc-bpm" class="msc-bpm">80 BPM</span></button>
+    <div class="msc-bar" id="msc-bar">
+      <button id="btn-msc" class="msc" type="button" aria-pressed="false"><span id="msc-lbl">Metronome: OFF</span></button>
+      <label class="msc-tempo"><input id="msc-in" class="msc-in" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" value="80" autocomplete="off" aria-label="Tempo in BPM"><span class="msc-u">BPM</span></label>
+    </div>
   </section>
 
   <section class="panel timed" aria-label="Timed exercise">
@@ -328,7 +340,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-o
 
 <script>
 'use strict';
-const APP_VERSION='2.2.0';
+const APP_VERSION='2.2.1';
 
 // ── Exercise catalogue ─────────────────────────────────────────────────────
 const SCALE_TYPES=['Major','Major Bebop','Dominant 7th','Dominant Bebop','Natural Minor','Minor Bebop','Harmonic Minor','Melodic Minor','Chromatic Jazz','Whole-Half','Half-Whole'];
@@ -648,13 +660,14 @@ function updSW(){
   sw.className=status==='running'?'run':status==='paused'?'pau':'';
   $('sw-st').textContent=status==='completed'?'final: '+fmtT(finalTime):status==='paused'?'paused':status==='running'?'running':'ready';
 }
+// The tempo can be typed at the top (big number) or in the note card bar: both show the same value
 function updBpm(){
-  const inp=$('bpm-in');
-  if(document.activeElement!==inp) inp.value=String(Math.round(liveBpm));
-  inp.classList.toggle('run',metRun);
+  const v=String(Math.round(liveBpm));
+  ['bpm-in','msc-in'].forEach(id=>{const el=$(id);if(document.activeElement!==el) el.value=v;});
+  $('bpm-in').classList.toggle('run',metRun);
   $('tempo-nm').textContent=tname(liveBpm);
-  $('msc-bpm').textContent=Math.round(liveBpm)+' BPM';
 }
+function setStaticBpm(v){sBpm=v;if(metMode==='static'){liveBpm=v;if(metRun) metCurBpm=v;}updBpm();}
 function updBtns(){
   const run=status==='running',pau=status==='paused',idle=status==='idle',done=status==='completed',locked=run||pau;
   const def=!!curEx();
@@ -865,8 +878,8 @@ function updMetroBtn(){
   b.classList.toggle('stop',metroPlaying);
   b.setAttribute('aria-label',metroPlaying?'Stop the metronome':'Start the metronome');
   // shortcut in the note card: shows whether the metronome is sounding
-  const m=$('btn-msc');
-  m.classList.toggle('on',metRun);m.setAttribute('aria-pressed',metRun?'true':'false');
+  $('msc-bar').classList.toggle('on',metRun);
+  $('btn-msc').setAttribute('aria-pressed',metRun?'true':'false');
   $('msc-lbl').textContent='Metronome: '+(metRun?'ON':'OFF');
 }
 
@@ -877,6 +890,7 @@ function setMetMode(m){
   $('row-ramp').hidden=m!=='ramp';
   document.querySelectorAll('.mute-ctl').forEach(el=>{el.hidden=m==='ramp';});
   $('bpm-in').readOnly=m==='ramp';
+  $('msc-in').readOnly=m==='ramp';
   resetMuteCycle();
   if(metRun){metMeasDone=0;metCurBpm=m==='ramp'?rStart:sBpm;}
   liveBpm=Math.round(m==='ramp'?(metRun?metCurBpm:rStart):sBpm);
@@ -1228,7 +1242,8 @@ function init(){
   $('metro-play-btn').addEventListener('click',toggleMetro);
   $('bc-btn').addEventListener('click',cycleBarCounter);
   $('vis-btn').addEventListener('click',()=>{showVisualOnMute=!showVisualOnMute;updMuteUI();});
-  bindNum('bpm-in',20,280,()=>sBpm,v=>{sBpm=v;if(metMode==='static'){liveBpm=v;if(metRun) metCurBpm=v;}updBpm();});
+  bindNum('bpm-in',20,280,()=>sBpm,setStaticBpm);
+  bindNum('msc-in',20,280,()=>sBpm,setStaticBpm);
   bindNum('in-bpb',1,8,()=>bpM,setBpM);
   bindNum('in-mute',0,32,()=>muteBars,v=>{muteBars=v;resyncMute();updMuteUI();});
   bindNum('in-play',1,32,()=>playBars,v=>{playBars=v;resyncMute();});
